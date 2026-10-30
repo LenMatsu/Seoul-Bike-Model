@@ -10,6 +10,11 @@ df = pd.read_csv("SeoulBikeData.csv", encoding="unicode_escape")
 median_rentals = df['Rented Bike Count'].median()
 df['High_Demand'] = (df['Rented Bike Count'] > median_rentals).astype(int)
 
+df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
+df['Month'] = df['Date'].dt.month.astype(str)
+df['DayOfWeek'] = df['Date'].dt.dayofweek.astype(str)
+df['Hour'] = df['Hour'].astype(str)
+
 df_encoded = pd.get_dummies(df.drop(columns=['Date', 'Rented Bike Count']), drop_first=True)
 
 X = df_encoded.drop(columns=['High_Demand'])
