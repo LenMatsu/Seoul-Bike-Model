@@ -8,12 +8,20 @@ from sklearn.metrics import classification_report, confusion_matrix
 # 1. Load Dataset
 df = pd.read_csv("SeoulBikeData.csv", encoding="unicode_escape")
 
-# 2. Preprocessing & Target Definition
+# 2. Preprocessing, Feature Engineering & Target Definition
 # Create a binary target: 1 = High Demand (> median rentals), 0 = Low/Medium Demand
 median_rentals = df['Rented Bike Count'].median()
 df['High_Demand'] = (df['Rented Bike Count'] > median_rentals).astype(int)
 
-# One-Hot Encode categorical features (Seasons, Holiday, Functioning Day)
+# Extract Month and Day of Week from Date before dropping it
+df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
+df['Month'] = df['Date'].dt.month.astype(str)
+df['DayOfWeek'] = df['Date'].dt.dayofweek.astype(str)
+
+# Treat Hour as a category so rush hours (e.g., 8 AM, 6 PM) get their own weights
+df['Hour'] = df['Hour'].astype(str)
+
+# One-Hot Encode categorical features (Hour, Month, DayOfWeek, Seasons, Holiday, Functioning Day)
 df_encoded = pd.get_dummies(df.drop(columns=['Date', 'Rented Bike Count']), drop_first=True)
 
 # Separate features (X) and target (y)
